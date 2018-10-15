@@ -1,0 +1,23 @@
+{
+    "name": "class-error-catch",
+    "version": "1.0.0",
+    "description": "catch class error",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "class",
+        "error",
+        "catch"
+    ],
+    "author": "xiangwenhu",
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.1.2",
+        "@babel/plugin-proposal-class-properties": "^7.1.0",
+        "@babel/plugin-proposal-decorators": "^7.1.2",
+        "@babel/register": "^7.0.0",
+        "assert": "^1.4.1"
+    }
+}
