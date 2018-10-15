@@ -11,6 +11,10 @@
         "error",
         "catch"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xiangwenhu/class-error-catch.git"
+    },
     "author": "xiangwenhu",
     "license": "MIT",
     "devDependencies": {
