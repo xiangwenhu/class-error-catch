@@ -8,10 +8,27 @@ const config = {
 
 const catchError = createCatchError(config)
 
+
+function getPromise() {
+    return new Promise((resolve, reject) => {
+        setTimeout(()=>{
+            reject(new Error('超时错误'))
+        },1000)
+    })
+}
+
 class DemoClass {
     @catchError('Error from method sayHi')
     sayHi() {
         console.log(this.xxx.xxx)
     }
+
+    @catchError('Error from async method sayHi2')
+    async sayHi2() {
+        const r = await getPromise()
+        console.log('result', r)
+    }
 }
-new DemoClass().sayHi()
+const demoClass = new DemoClass()
+demoClass.sayHi()
+demoClass.sayHi2()

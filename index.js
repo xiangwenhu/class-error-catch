@@ -31,9 +31,10 @@ function defaultShouldProxy(property, descriptor) {
 }
 
 function observerHandler(fn, context, callback) {
-    return function (...args) {
+    return async function (...args) {
         try {
-            return fn.call(context, ...args)
+            const r = await fn.call(context, ...args)
+            return r
         } catch (err) {
             callback(err)
         }
@@ -47,7 +48,6 @@ module.exports = function createCatchError({
 }) {
 
     function catchProperty(target, key, descriptor, ...params) {
-        debugger
         if (descriptor.initializer && typeof descriptor.initializer() === 'function') {
             return catchInitializer(target, key, descriptor, ...params)
         } else if (typeof descriptor.value === 'function') {
