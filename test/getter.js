@@ -14,6 +14,8 @@ class DemoClass {
     get sayHi() {
         console.log(this.xxx.xxx)
     }
+   
 }
 
-new DemoClass().sayHi()
+const demoClass = new DemoClass()
+demoClass.sayHi()
