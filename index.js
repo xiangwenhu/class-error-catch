@@ -1,12 +1,13 @@
 
-const { isDescriptor } = require('./common')
-
+const { isDescriptor, createDefaultSetter } = require('./common')
 
 const {
     getOwnPropertyDescriptors,
-    defineProperty
+    defineProperty,
+    getPrototypeOf
 } = Object
 
+const WHITE_LIST = ['constructor']
 
 /**
  * 默认错误处理函数
@@ -24,11 +25,19 @@ function defaultErrorHanlder(err, target, methodName, ...params) {
  * @param {Function} method 
  * @param {Object} descriptor 
  */
-function defaultShouldProxy(method, descriptor) {
-    return typeof descriptor.value === 'function'
-        && descriptor.configurable
-        && descriptor.writable
-        && !descriptor.value.bound
+function defaultShouldProxy(property, descriptor) {
+    return descriptor.configurable
+        && !WHITE_LIST.includes(property)
+}
+
+function observerHandler(fn, context, callback) {
+    return function (...args) {
+        try {
+            return fn.call(context, ...args)
+        } catch (err) {
+            callback(err)
+        }
+    }
 }
 
 
@@ -37,23 +46,16 @@ module.exports = function createCatchError({
     shouldProxy
 }) {
 
-    function observerHandler(fn, context, callback) {
-        return function (...args) {
-            try {
-                return fn.call(context, ...args)
-            } catch (err) {
-                callback(err)
-            }
-        }
-    }
-
-
     function catchProperty(target, key, descriptor, ...params) {
+        debugger
         if (descriptor.initializer && typeof descriptor.initializer() === 'function') {
-            catchInitializer(target, key, descriptor, ...params)
+            return catchInitializer(target, key, descriptor, ...params)
         } else if (typeof descriptor.value === 'function') {
-            catchMethod(target, key, descriptor, ...params)
+            return catchMethod(target, key, descriptor, ...params)
+        } else if (typeof descriptor.get === 'function') {
+            return catchGetter(target, key, descriptor, ...params)
         }
+        return descriptor
     }
 
     function catchInitializer(target, key, descriptor, ...params) {
@@ -77,13 +79,52 @@ module.exports = function createCatchError({
         }
         const { value: fn } = descriptor
 
-        descriptor.value = function () {
-            const boundFn = observerHandler(fn, this, err => {
-                errorHandler(err, target, key, ...params)
-            })
-            boundFn.bound = true
-            return boundFn()
-        }
+        defineProperty(descriptor, 'value', {
+            value: function () {
+                const boundFn = observerHandler(fn, this, err => {
+                    errorHandler(err, target, key, ...params)
+                })
+                boundFn.bound = true
+                return boundFn()
+            }
+        })
+
+        return descriptor
+    }
+
+    function catchGetter(target, key, descriptor, ...params) {
+
+        const { constructor } = target
+        const { get: fn } = descriptor
+      
+        defineProperty(descriptor, 'get', {
+            value: function () {
+                // Class.prototype.key lookup
+                // Someone accesses the property directly on the prototype on which it is
+                // actually defined on, i.e. Class.prototype.hasOwnProperty(key)
+                if (this === target) {
+                    return fn;
+                }
+                // Class.prototype.key lookup
+                // Someone accesses the property directly on a prototype but it was found
+                // up the chain, not defined directly on it
+                // i.e. Class.prototype.hasOwnProperty(key) == false && key in Class.prototype
+                if (this.constructor !== constructor && getPrototypeOf(this).constructor === constructor) {
+                    return fn;
+                }
+                const boundFn = observerHandler(fn, this, err => {
+                    errorHandler(err, target, key, ...params)
+                })
+                defineProperty(this, key, {
+                    configurable: true,
+                    writable: true,
+                    enumerable: false,
+                    value: boundFn
+                });
+                boundFn.bound = true
+                return boundFn;
+            }
+        })
 
         return descriptor
     }
@@ -92,10 +133,10 @@ module.exports = function createCatchError({
         // 获得所有自定义方法，未处理Symbols
         const target = targetArg.prototype || targetArg
         let descriptors = getOwnPropertyDescriptors(target)
-        for (let [method, descriptor] of Object.entries(descriptors)) {
-            if (defaultShouldProxy(method, descriptor) &&
-                (!shouldProxy || shouldProxy && typeof shouldProxy === 'function' && !!shouldProxy(method, descriptor))) {
-                defineProperty(target, method, catchMethod(target, method, descriptors[method], ...params))
+        for (let [property, descriptor] of Object.entries(descriptors)) {
+            if (defaultShouldProxy(property, descriptor) &&
+                (!shouldProxy || shouldProxy && typeof shouldProxy === 'function' && !!shouldProxy(property, descriptor))) {
+                defineProperty(target, property, catchProperty(target, property, descriptors[property], ...params))
             }
         }
     }

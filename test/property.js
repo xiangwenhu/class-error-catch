@@ -8,10 +8,10 @@ const config = {
 
 const catchError = createCatchError(config)
 
-class DemoClass2 {
-    @catchError('sayHi Error from DemoClass2')
+class DemoClass {
+    @catchError('Error from property sayHi ')
     sayHi = () => {
         console.log(this.xxx.xxx)
     }
 }
-new DemoClass2().sayHi()
+new DemoClass().sayHi()

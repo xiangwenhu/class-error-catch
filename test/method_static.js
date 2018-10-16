@@ -9,9 +9,11 @@ const config = {
 const catchError = createCatchError(config)
 
 class DemoClass {
-    @catchError('Error from method sayHi')
-    sayHi() {
+
+    @catchError('error from DemoClass static method sayHi')
+    static sayHi() {
         console.log(this.xxx.xxx)
     }
 }
-new DemoClass().sayHi()
+
+DemoClass.sayHi()

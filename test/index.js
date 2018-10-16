@@ -2,4 +2,10 @@
 require("@babel/register")()
 
 
-require('./test')
+//require('./method')
+//require('./method_static')
+//require('./property')
+//require('./class')
+// require('./getter')
+
+
