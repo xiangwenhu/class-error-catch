@@ -1,6 +1,6 @@
 {
     "name": "class-error-catch",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "catch class error",
     "main": "index.js",
     "scripts": {
