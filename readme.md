@@ -1,4 +1,5 @@
-捕捉class的错误, 支持方法,class
+基于decorator的错误捕捉   
+支持方法,属性,class
 
 ## Installation
 
