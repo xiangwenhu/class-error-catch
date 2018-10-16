@@ -25,7 +25,7 @@ function defaultErrorHanlder(err, target, methodName, ...params) {
  * @param {Function} method 
  * @param {Object} descriptor 
  */
-function defaultShouldProxy(property, descriptor) {
+function defaultFilter(property, descriptor) {
     return descriptor.configurable
         && !WHITE_LIST.includes(property)
 }
@@ -44,7 +44,7 @@ function observerHandler(fn, context, callback) {
 
 module.exports = function createCatchError({
     errorHandler = defaultErrorHanlder,
-    shouldProxy
+    filter
 }) {
 
     function catchProperty(target, key, descriptor, ...params) {
@@ -134,8 +134,8 @@ module.exports = function createCatchError({
         const target = targetArg.prototype || targetArg
         let descriptors = getOwnPropertyDescriptors(target)
         for (let [property, descriptor] of Object.entries(descriptors)) {
-            if (defaultShouldProxy(property, descriptor) &&
-                (!shouldProxy || shouldProxy && typeof shouldProxy === 'function' && !!shouldProxy(property, descriptor))) {
+            if (defaultFilter(property, descriptor) &&
+                (!filter || filter && typeof filter === 'function' && !!filter(property, descriptor))) {
                 defineProperty(target, property, catchProperty(target, property, descriptors[property], ...params))
             }
         }

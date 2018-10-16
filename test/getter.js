@@ -1,4 +1,4 @@
-const createCatchError = require('..')
+const createCatchError = require('../')
 
 const config = {
     errorHandler: function (err, target, methodName, message) {
