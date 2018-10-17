@@ -16,8 +16,8 @@ const WHITE_LIST = ['constructor']
  * @param {String} methodName 
  * @param  {...any} params 
  */
-function defaultErrorHanlder(err, target, methodName, ...params) {
-    console.log('error catched by catchError decotator', err, target, methodName, ...params)
+function defaultErrorHanlder(err, target, context, methodName, ...params) {
+    console.log('error catched by catchError decotator', err, target, context, methodName, ...params)
 }
 
 /**
@@ -67,7 +67,7 @@ module.exports = function createCatchError({
         descriptor.initializer = function () {
             initValue.bound = true
             return observerHandler(initValue, this, error => {
-                errorHandler(error, target, key, ...params)
+                errorHandler(error, target, this, key, ...params)
             })
         }
         return descriptor
@@ -82,7 +82,7 @@ module.exports = function createCatchError({
         defineProperty(descriptor, 'value', {
             value: function () {
                 const boundFn = observerHandler(fn, this, err => {
-                    errorHandler(err, target, key, ...params)
+                    errorHandler(err, target, this, key, ...params)
                 })
                 boundFn.bound = true
                 return boundFn()
@@ -96,7 +96,7 @@ module.exports = function createCatchError({
 
         const { constructor } = target
         const { get: fn } = descriptor
-      
+
         defineProperty(descriptor, 'get', {
             value: function () {
                 // Class.prototype.key lookup
@@ -113,7 +113,7 @@ module.exports = function createCatchError({
                     return fn;
                 }
                 const boundFn = observerHandler(fn, this, err => {
-                    errorHandler(err, target, key, ...params)
+                    errorHandler(err, target, this, key, ...params)
                 })
                 defineProperty(this, key, {
                     configurable: true,
