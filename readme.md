@@ -17,11 +17,20 @@ createCatchError supports the following options:
     默认处理函数如下
 
 ```js
-function defaultErrorHanlder(err, target, methodName, ...params) {
+/**
+ * 默认错误处理函数
+ * @param {Error} err  错误信息
+ * @param {Class} target 错误发生所在的Class
+ * @param {Class Instance} context  错误发生所在的Class实例对象
+ * @param {String} methodName   错误发生的方法名
+ * @param  {...any} params  其他自定义参数
+ */
+function defaultErrorHanlder(err, target, context, methodName, ...params) {
     console.log(
         "error catched by catchError decotator",
         err,
         target,
+        context,
         methodName,
         ...params
     );
@@ -52,14 +61,12 @@ const config = {
         context,
         methodName,
         message,
-        ...other
     ) {
         console.log("err:", err); //错误信息
         console.log("target:", target); //错误发生所在的Class
         console.log("context:", context); // 错误发生所在的Class实例对象
         console.log("methodName:", methodName); // 错误发生的方法名
         console.log("message:", message); // 自定义的错误消息
-        console.log("others:", others); // 自定义的其他参数
     }
 };
 
@@ -74,7 +81,7 @@ function getPromise() {
 }
 
 class DemoClass {
-    
+
     @catchError("Error from method sayHi")
     sayHi() {
         console.log(this.xxx.xxx);
@@ -135,15 +142,13 @@ const config = {
         target,
         context,
         methodName,
-        message,
-        ...other
+        message
     ) {
         console.log("err:", err); //错误信息
         console.log("target:", target); //错误发生所在的Class
         console.log("context:", context); // 错误发生所在的Class实例对象
         console.log("methodName:", methodName); // 错误发生的方法名
         console.log("message:", message); // 自定义的错误消息
-        console.log("others:", others); // 自定义的其他参数
     },
     filter: function(propertyName, descriptor) {
         return !customFilter(propertyName);

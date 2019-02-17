@@ -5,14 +5,20 @@ const { getOwnPropertyDescriptors, defineProperty, getPrototypeOf } = Object;
 const WHITE_LIST = ["constructor"];
 
 /**
- * 默认错误处理函数
- * @param {Error} err
- * @param {Class} target
- * @param {Class Instance} context
- * @param {String} methodName
- * @param  {...any} params
+ * 
+ * @param {Error} err 
+ * @param {Class} target 
+ * @param {Class Instance} context 
+ * @param {String} methodName 
+ * @param  {...any} params 
  */
-function defaultErrorHanlder(err, target, context, methodName, ...params) {
+function defaultErrorHanlder(
+    err,
+    target,
+    context,
+    methodName,
+    ...params
+) {
     console.log(
         "error catched by catchError decotator",
         err,
