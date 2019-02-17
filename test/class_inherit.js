@@ -9,13 +9,14 @@ const config = {
         message,
         ...others
     ) {
-        //console.log(`${methodName} in  ${target.constructor.name}\r\n`, `自定义消息:${message}\r\n`) //, `更多细节:${err.message} , ${err.stack}`)
+        console.log('==========================================================================')
         console.log("err:", err);
         console.log("target:", target);
         console.log("context:", context);
         console.log("methodName:", methodName);
         console.log("message:", message);
         console.log("others:", others);
+        console.log('==========================================================================')
     }
 };
 

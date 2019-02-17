@@ -1,10 +1,25 @@
 const createCatchError = require('../index')
 
 const config = {
-    errorHandler: function (err, target, methodName, message) {
-        console.log(`${methodName} in  ${target.constructor.name}\t`, `自定义消息:${message}\t`, `更多细节:${err.message}`) // , ${err.stack}`)
+    errorHandler: function(
+        err,
+        target,
+        context,
+        methodName,
+        message,
+        ...others
+    ) {
+        console.log('==========================================================================')
+        console.log("err:", err);
+        console.log("target:", target);
+        console.log("context:", context);
+        console.log("methodName:", methodName);
+        console.log("message:", message);
+        console.log("others:", others);
+        console.log('==========================================================================')
     }
-}
+};
+
 
 const catchError = createCatchError(config)
 
