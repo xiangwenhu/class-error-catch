@@ -53,6 +53,7 @@ module.exports = function createCatchError({
     errorHandler = defaultErrorHanlder,
     filter
 }) {
+
     function catchProperty(target, key, descriptor, ...params) {
         if (
             descriptor.initializer &&
@@ -67,6 +68,7 @@ module.exports = function createCatchError({
         return descriptor;
     }
 
+     // class A{ say = ()=>{} }
     function catchInitializer(target, key, descriptor, ...params) {
         const initValue = descriptor.initializer();
         if (typeof initValue !== "function") {
@@ -82,6 +84,7 @@ module.exports = function createCatchError({
         return descriptor;
     }
 
+    // class A { say(){}}
     function catchMethod(target, key, descriptor, ...params) {
         if (typeof descriptor.value !== "function") {
             return descriptor;
@@ -101,6 +104,7 @@ module.exports = function createCatchError({
         return descriptor;
     }
 
+     // class A { get say(){}}
     function catchGetter(target, key, descriptor, ...params) {
         const { constructor } = target;
         const { get: fn } = descriptor;
